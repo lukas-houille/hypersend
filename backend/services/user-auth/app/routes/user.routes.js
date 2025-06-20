@@ -1,32 +1,20 @@
 import express from "express";
-import { authJwt } from "../middlewares/index.js";
+import {authJwt} from "../middlewares/index.js";
 
 const authorizedAccess = (req, res) => {
-    res.status(200).json({ message: "Authentication successful." });
+    res.status(200).json({message: "Authentication successful.", user: {email: req.user.email, type: req.user.type}});
 };
 
 const router = express.Router();
 
 // Client Route
-router.get(
-    "/client/*splat",
-    [authJwt.verifyToken, authJwt.isClient],
-    authorizedAccess
-);
+router.get("/client/*splat", [authJwt.verifyToken, authJwt.isClient], authorizedAccess);
 
 // Driver Route
-router.get(
-    "/driver/*splat",
-    [authJwt.verifyToken, authJwt.isDriver],
-    authorizedAccess
-);
+router.get("/driver/*splat", [authJwt.verifyToken, authJwt.isDriver], authorizedAccess);
 
 // Restaurant Route
-router.get(
-    "/restaurant/*splat",
-    [authJwt.verifyToken, authJwt.isRestaurant],
-    authorizedAccess
-);
+router.get("/restaurant/*splat", [authJwt.verifyToken, authJwt.isRestaurant], authorizedAccess);
 
 // Landing Page Route
 router.get("/", (req, res) => {
@@ -35,7 +23,7 @@ router.get("/", (req, res) => {
 
 // Fallback Route for 404 Not Found
 router.get("/*splat", (req, res) => {
-    res.status(404).json({ message: "Not found." });
+    res.status(404).json({message: "Not found."});
 });
 
 export default router;

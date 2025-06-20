@@ -2,4 +2,4 @@
 
 ## Services
 
-- [auth](./user-auth/README.md): Authentication service
+- [user-auth](./user-auth/README.md): User Authentication service

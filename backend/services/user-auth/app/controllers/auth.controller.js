@@ -1,4 +1,3 @@
-// app/controllers/auth.controller.js
 import db from "../models/index.js";
 import authConfig from "../config/auth.config.js";
 import jwt from "jsonwebtoken";
@@ -6,15 +5,16 @@ import bcrypt from "bcryptjs";
 
 export const signUp = async (req, res) => {
     try {
-        const userType = req.body.type;
-        // check user type
-        const UserModel = db.mymodels[userType];
-        if (!UserModel) {
-            return res.status(500).json({message: "Invalid user type!"});
+        const UserModel = db.mymodels[req.body.type];
+        const user = await UserModel.findOne({
+            where: { email: req.body.email },
+        });
+        if (user) {
+            return res.status(400).json({"message": "User already exists!"});
         }
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         // Create user
-         await UserModel.create({
+        await UserModel.create({
              email: req.body.email,
              password_hash: hashedPassword,
         });
@@ -26,35 +26,27 @@ export const signUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
     try {
-        // Determine user type based on JWT payload
-        const type = req.body.type;
-        const UserModel = db.mymodels[type];
-        if (!UserModel) {
-            return res.status(500).json({message: "Invalid user type!"});
-        }
-        // Find user by email
+        const UserModel = db.mymodels[req.body.type];
+        // Check if user exists
         const user = await UserModel.findOne({
-            where: {email: req.body.email},
+            where: { email: req.body.email },
         });
         if (!user) {
-            return res.status(401).json({accessToken: null, message: "Invalid email or password !"});
+            return res.status(401).json({message: "Invalid email or password !"});
         }
-
         // Check password
         const passwordIsValid = await bcrypt.compare(req.body.password, user.password_hash);
         if (!passwordIsValid) {
-            return res.status(401).json({accessToken: null, message: "Invalid email or password !"});
+            return res.status(401).json({message: "Invalid email or password !"});
         }
         // Create JWT token
-        const token = jwt.sign({email: user.email, type: type}, authConfig.secret, {
+        const token = jwt.sign({email: user.email, type: req.body.type}, authConfig.secret, {
             expiresIn: 86400, // 24 hours
         });
-
         // Respond with user details and token
-
         res.status(200).json({
             email: user.email,
-            type: type,
+            type: req.body.type,
             accessToken: token,
         });
     } catch (error) {
