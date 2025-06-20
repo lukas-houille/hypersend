@@ -17,27 +17,28 @@ export default (sequelize, DataTypes) => {
         },
         first_name: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         last_name: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         date_of_birth: {
             type: DataTypes.DATEONLY,
-            allowNull: false,
+            allowNull: true,
         },
         phone_number: {
             type: DataTypes.STRING(20),
-            allowNull: false,
+            allowNull: true,
         },
         driver_license: {
             type: DataTypes.STRING(100),
-            allowNull: false,
+            allowNull: true,
         },
         rating: {
             type: DataTypes.DECIMAL(2, 1),
             defaultValue: 0.0,
+            allowNull: true,
         },
         address_id: {
             type: DataTypes.BIGINT,
@@ -45,6 +46,7 @@ export default (sequelize, DataTypes) => {
                 model: "addresses",
                 key: "address_id",
             },
+            allowNull: true,
         },
         registered_at: {
             type: DataTypes.DATE,
