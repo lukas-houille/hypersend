@@ -3,7 +3,6 @@ name: Build & Push Microservices
 on:
   push:
     branches:
-      - dev
       - main
   workflow_dispatch:
 
@@ -41,5 +40,5 @@ jobs:
           file: ./backend/services/${{ matrix.service }}/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REPO }}:${{ matrix.service }}-${{ github.ref_name }}-${{ env.SHORT_SHA }}
-            ${{ env.DOCKER_REPO }}:${{ matrix.service }}-${{ github.ref_name }}-latest
+            ${{ env.DOCKER_REPO }}:${{ matrix.service }}-${{ env.SHORT_SHA }}
+            ${{ env.DOCKER_REPO }}:${{ matrix.service }}-latest
