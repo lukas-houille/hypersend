@@ -27,8 +27,8 @@ export const signUp = async (req, res) => {
 export const signIn = async (req, res) => {
     try {
         // Determine user type based on JWT payload
-        const userType = req.body.type;
-        const UserModel = db.mymodels[userType];
+        const type = req.body.type;
+        const UserModel = db.mymodels[type];
         if (!UserModel) {
             return res.status(500).json({message: "Invalid user type!"});
         }
@@ -46,7 +46,7 @@ export const signIn = async (req, res) => {
             return res.status(401).json({accessToken: null, message: "Invalid email or password !"});
         }
         // Create JWT token
-        const token = jwt.sign({email: user.email, userType: userType}, authConfig.secret, {
+        const token = jwt.sign({email: user.email, type: type}, authConfig.secret, {
             expiresIn: 86400, // 24 hours
         });
 
@@ -54,7 +54,7 @@ export const signIn = async (req, res) => {
 
         res.status(200).json({
             email: user.email,
-            userType: userType,
+            type: type,
             accessToken: token,
         });
     } catch (error) {
