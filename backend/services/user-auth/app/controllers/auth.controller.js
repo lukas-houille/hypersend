@@ -37,7 +37,7 @@ export const signIn = async (req, res) => {
         // Check password
         const passwordIsValid = await bcrypt.compare(req.body.password, user.password_hash);
         if (!passwordIsValid) {
-            return res.status(401).json({Òmessage: "Invalid email or password !"});
+            return res.status(401).json({message: "Invalid email or password !"});
         }
         // Create JWT token
         const token = jwt.sign({email: user.email, type: req.body.type}, authConfig.secret, {
