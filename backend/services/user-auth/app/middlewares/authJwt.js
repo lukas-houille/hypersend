@@ -20,8 +20,8 @@ const verifyToken = (req, res, next) => {
         if (err) {
             return res.status(401).json({ message: "Unauthorized!" });
         }
-        req.userEmail = decoded.email;
-        req.type = decoded.type;
+        req.JWTEmail = decoded.email;
+        req.JWType = decoded.type;
         next();
     });
 };
@@ -31,17 +31,15 @@ const verifyToken = (req, res, next) => {
 const isClient = async (req, res, next) => {
     try {
         // Check if the user is a client
-        if (!req.type || req.type !== "client") {
+        if (!req.JWType || req.JWType !== "client") {
             return res.status(403).json({ message: "Unauthorized" });
         }
         const client = await Client.findOne({
-            where: { email: req.userEmail },
+            where: { email: req.JWTEmail },
         });
-
         if (!client) {
             return res.status(403).json({ message: "Unauthorized" });
         }
-
         next();
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -53,16 +51,15 @@ const isClient = async (req, res, next) => {
 const isDriver = async (req, res, next) => {
     try {
         // Check if the user is a driver
-        if (!req.type || req.type !== "driver") {
+        if (!req.JWType || req.JWType !== "driver") {
             return res.status(403).json({ message: "Unauthorized" });
         }
         const driver = await db.driver.findOne({
-            where: { email: req.userEmail },
+            where: { email: req.JWTEmail },
         });
         if (!driver) {
             return res.status(403).json({ message: "Unauthorized" });
         }
-
         next();
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -74,11 +71,11 @@ const isDriver = async (req, res, next) => {
 const isRestaurant = async (req, res, next) => {
     try {
         // Check if the user is a restaurant
-        if (!req.type || req.type !== "restaurant") {
+        if (!req.JWType || req.JWType !== "restaurant") {
             return res.status(403).json({ message: "Unauthorized" });
         }
         const restaurant = await db.restaurant.findOne({
-            where: { email: req.userEmail },
+            where: { email: req.JWTEmail },
         });
 
         if (!restaurant) {
