@@ -7,7 +7,7 @@ export default (sequelize, DataTypes) => {
         },
         name: {
             type: DataTypes.STRING(255),
-            allowNull: false,
+            allowNull: true,
         },
         email: {
             type: DataTypes.STRING(255),
@@ -21,7 +21,7 @@ export default (sequelize, DataTypes) => {
         },
         phone_number: {
             type: DataTypes.STRING(20),
-            allowNull: false,
+            allowNull: true,
         },
         type: {
             type: DataTypes.BIGINT,
@@ -29,6 +29,7 @@ export default (sequelize, DataTypes) => {
                 model: "restaurant_type",
                 key: "restaurant_type_id",
             },
+            allowNull: true,
         },
         address_id: {
             type: DataTypes.BIGINT,
@@ -36,12 +37,15 @@ export default (sequelize, DataTypes) => {
                 model: "addresses",
                 key: "address_id",
             },
+            allowNull: true,
         },
         opening_hours: {
             type: DataTypes.TEXT,
+            allowNull: true,
         },
         opening_days: {
             type: DataTypes.TEXT,
+            allowNull: true,
         },
         rating: {
             type: DataTypes.DECIMAL(2, 1),

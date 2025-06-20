@@ -29,6 +29,10 @@ const verifyToken = (req, res, next) => {
 
 const isClient = async (req, res, next) => {
     try {
+        // Check if the user is a client
+        if (!req.type || req.type !== "client") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
         const client = await Client.findOne({
             where: { email: req.userEmail },
         });
@@ -47,6 +51,10 @@ const isClient = async (req, res, next) => {
 
 const isDriver = async (req, res, next) => {
     try {
+        // Check if the user is a driver
+        if (!req.type || req.type !== "driver") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
         const driver = await db.driver.findOne({
             where: { email: req.userEmail },
         });
@@ -64,6 +72,10 @@ const isDriver = async (req, res, next) => {
 
 const isRestaurant = async (req, res, next) => {
     try {
+        // Check if the user is a restaurant
+        if (!req.type || req.type !== "restaurant") {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
         const restaurant = await db.restaurant.findOne({
             where: { email: req.userEmail },
         });
