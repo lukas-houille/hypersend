@@ -1,3 +1,4 @@
+import express from "express";
 import {checkSignRequest} from "../middleware/auth";
 import {signUp, signIn} from "../controller/auth.controller";
 
