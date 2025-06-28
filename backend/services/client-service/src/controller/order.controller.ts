@@ -54,7 +54,7 @@ export const getOrderData = async (req: Request, res: Response) => {
 
 export const checkOrderData = async (req: Request, res: Response, next: NextFunction) => {
     // This function is a placeholder for verifying order data.
-    if (checkNewOrderRequest(req, res)) {
+    if (checkNewOrderRequest(req)) {
         next();
     } else {
         res.status(400).json({error: "Invalid order request"});

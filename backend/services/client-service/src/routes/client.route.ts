@@ -13,7 +13,7 @@ clientRoute.post("/neworder", checkOrderData, sendOrderRequest);
 
 clientRoute.post("/rating", defaultResponse);
 
-clientRoute.get("/order-tracking/:id", defaultResponse);
+clientRoute.get("/order-tracking/", defaultResponse);
 
 clientRoute.get("/profile", defaultResponse);
 
