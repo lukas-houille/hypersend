@@ -27,6 +27,12 @@ export function authMiddleware(requiredRoles: string[] = []) {
                 res.status(403).json({ message: "Unauthorized" });
                 return;
             }
+            // Attach user information to the request object
+            req.body = {
+                email: decodedToken.email,
+                role: decodedToken.role,
+                userId: Number(user[0].id) // Assuming the user table has an 'id' field
+            };
             next()
         } catch (error){
             res.status(403).json({})
