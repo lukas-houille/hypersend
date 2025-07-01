@@ -4,9 +4,8 @@ import {db} from "../db";
 import {eq} from "drizzle-orm";
 import {roleTable} from "../db/schema";
 
-export function authMiddleware(requiredRoles: string[] = []) {
+export function authMiddleware(role: string) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const role = requiredRoles[0]
         const token = req.headers["x-access-token"] || req.headers["authorization"];
         if (!token) {
             res.status(403).json({ message: "No token provided!" });
@@ -31,7 +30,7 @@ export function authMiddleware(requiredRoles: string[] = []) {
             req.body = {
                 email: decodedToken.email,
                 role: decodedToken.role,
-                userId: Number(user[0].id) // Assuming the user table has an 'id' field
+                userId: Number(user[0].id)
             };
             next()
         } catch (error){

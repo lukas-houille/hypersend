@@ -8,20 +8,20 @@ userRoutes.get("/", async (req, res) => {
 })
 
 userRoutes.get("/client/*splat",
-    authMiddleware(["client"]),
+    authMiddleware("client"),
     async (req, res) => {
         res.status(200).send({message: "Client route is working"})
     })
 
 userRoutes.get("/driver/*splat",
-    authMiddleware(["driver"]),
+    authMiddleware("driver"),
     async (req, res) => {
         res.status(200).send({
             message: "Driver route is working"
         })
     })
 userRoutes.get("/restaurant/*splat",
-    authMiddleware(["restaurant"]),
+    authMiddleware("restaurant"),
     async (req, res) => {
         res.status(200).send({
             message: "Restaurant route is working"
