@@ -1,7 +1,9 @@
 import {retrieveOrderDataByDates, retrieveOrderDataByID} from "../middleware/getOrder";
 import {Request, Response, NextFunction} from "express";
 import {checkNewOrderRequest} from "../middleware/checkNewOrderRequest";
-import {sendOrderToMessageBroker} from "../middleware/sendOrder";
+import {currentOrders, rabbitChannel} from "../server";
+import {rabbitmqPublish} from 'myrabbitconfig';
+import {createSenderSendEvents} from "../middleware/createSenderSendEvents";
 
 export const getOrderData = async (req: Request, res: Response) => {
     try {
@@ -22,7 +24,6 @@ export const getOrderData = async (req: Request, res: Response) => {
             return;
         }
         try {
-            console.log('pass');
             let orderData = [];
             if (orderId) {
                 orderData = await retrieveOrderDataByID(orderId, clientId);
@@ -63,7 +64,47 @@ export const checkOrderData = async (req: Request, res: Response, next: NextFunc
 }
 
 export const sendOrderRequest = async (req: Request, res: Response) => {
-    await sendOrderToMessageBroker(req);
-    res.status(200).json({message: "Order request sent successfully"});
-    return;
+    try {
+        if( rabbitChannel && !currentOrders[req.body.userId] ) {
+            const data = {
+                userId: req.body.userId,
+                orderDetails: req.body.orderDetails,
+            }
+            await rabbitmqPublish(rabbitChannel, "hypersend", "client.order.neworder", {data});
+            createSenderSendEvents(req, res)
+            return;
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({error: "Error while sending order request"});
+        return;
+    }
+}
+
+export const getOrderTracking = async (req: Request, res: Response) => {
+    try {
+        const userId: number = req.body.userId;
+        if (!userId) {
+            res.status(400).json({message: "Order ID is required"});
+            return;
+        }
+        if (!currentOrders[userId]) {
+            // if the order is not in currentOrders, get order state
+            res.status(404).json({message: "No tracking information found for this order"});
+            return;
+        } else {
+            const headers = {
+                'Content-Type': 'text/event-stream',
+                'Connection': 'keep-alive',
+                'Cache-Control': 'no-cache'
+            };
+            res.writeHead(200, headers);
+            res.write(`Order tracking for user ${userId}\n\n`);
+            currentOrders[userId].end();
+            currentOrders[userId] = res;
+        }
+    } catch (error) {
+        console.error("Error in getOrderTracking:", error);
+        res.status(500).json({error: "Error while retrieving order tracking information"});
+    }
 }

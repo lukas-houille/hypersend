@@ -2,8 +2,6 @@ import {eq, and, gte, lt} from "drizzle-orm";
 import {db} from "../db";
 import {orders} from "../db/orders";
 
-// Date can be null, so we need to handle that case
-
 export async function retrieveOrderDataByID(orderId: number, clientId: number) {
     try {
         return await db.select().from(orders).where(
