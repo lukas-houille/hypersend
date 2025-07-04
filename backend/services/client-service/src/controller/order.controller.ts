@@ -68,7 +68,9 @@ export const sendOrderRequest = async (req: Request, res: Response) => {
         if( rabbitChannel && !currentOrders[req.body.userId] ) {
             const data = {
                 userId: req.body.userId,
-                orderDetails: req.body.orderDetails,
+                type: "NEW",
+                order: req.body.orderDetails.order,
+                items: req.body.orderDetails.items,
             }
             await rabbitmqPublish(rabbitChannel, "hypersend", "client.order.neworder", {data});
             createSenderSendEvents(req, res)
