@@ -1,6 +1,5 @@
 import {retrieveOrderDataByDates, retrieveOrderDataByID} from "../middleware/getOrder";
-import {Request, Response, NextFunction} from "express";
-import {checkNewOrderRequest} from "../middleware/checkNewOrderRequest";
+import {Request, Response} from "express";
 import {currentOrders, rabbitChannel} from "../server";
 import {rabbitmqPublish} from 'myrabbitconfig';
 import {createSenderSendEvents} from "../middleware/createSenderSendEvents";
@@ -53,27 +52,20 @@ export const getOrderData = async (req: Request, res: Response) => {
     }
 }
 
-export const checkOrderData = async (req: Request, res: Response, next: NextFunction) => {
-    // This function is a placeholder for verifying order data.
-    if (checkNewOrderRequest(req)) {
-        next();
-    } else {
-        res.status(400).json({error: "Invalid order request"});
-        return;
-    }
-}
-
 export const sendOrderRequest = async (req: Request, res: Response) => {
     try {
         if( rabbitChannel && !currentOrders[req.body.userId] ) {
             const data = {
                 userId: req.body.userId,
                 type: "NEW",
-                order: req.body.orderDetails.order,
-                items: req.body.orderDetails.items,
+                items: req.body.items,
             }
             await rabbitmqPublish(rabbitChannel, "hypersend", "client.order.neworder", {data});
             createSenderSendEvents(req, res)
+            return;
+        } else {
+            // throw error if order already exists
+            res.status(400).json({message: "Order already exists or RabbitMQ channel is not initialized"});
             return;
         }
     } catch (error) {
@@ -102,7 +94,6 @@ export const getOrderTracking = async (req: Request, res: Response) => {
             };
             res.writeHead(200, headers);
             res.write(`Order tracking for user ${userId}\n\n`);
-            currentOrders[userId].end();
             currentOrders[userId] = res;
         }
     } catch (error) {

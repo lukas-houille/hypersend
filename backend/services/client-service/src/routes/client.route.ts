@@ -1,5 +1,5 @@
 import express from "express";
-import {checkOrderData, getOrderData, getOrderTracking, sendOrderRequest} from "../controller/order.controller";
+import {getOrderData, getOrderTracking, sendOrderRequest} from "../controller/order.controller";
 export const clientRoute = express.Router();
 
 const defaultResponse = (res:any) => {
@@ -8,11 +8,11 @@ const defaultResponse = (res:any) => {
 
 clientRoute.get("/orders", getOrderData );
 
-clientRoute.post("/neworder", checkOrderData, sendOrderRequest);
-
-clientRoute.post("/rating", defaultResponse);
+clientRoute.post("/neworder", sendOrderRequest);
 
 clientRoute.get("/order-tracking/", getOrderTracking);
+
+clientRoute.post("/rating", defaultResponse);
 
 clientRoute.get("/profile", defaultResponse);
 

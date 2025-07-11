@@ -19,14 +19,25 @@ app.listen(PORT, () => {
 export let currentOrders: { [key: string]: express.Response } = {};
 
 function fnConsumer(msg: any, callback: any) {
-    console.log("Received message: ", msg.content.toString());
-    // we tell rabbitmq that the message was processed successfully
+    const messageContent = JSON.parse(msg.content.toString());
+    const {userId, type, order, items} = messageContent;
+    // send response to client
+    if (currentOrders[userId]) {
+        currentOrders[userId].write(
+            `data: ${JSON.stringify({
+                type: type,
+                order: order,
+                items: items
+            })}\n\n`)
+    } else {
+        console.error("No response found for userId:", userId);
+    }
     callback(true);
 }
 
 export let rabbitChannel: Channel | null = null;
 
-initConnection((process.env.RABBITMQURL || "amqp://localhost"),"hypersend" , "clientService", "*.client.status", (channel:Channel, queue: string) => {
+initConnection((process.env.RABBITMQURL || "amqp://localhost"), "hypersend", "clientService", "*.client.status", (channel: Channel, queue: string) => {
     rabbitChannel = channel;
-    startConsumer(rabbitChannel,queue, fnConsumer);
+    startConsumer(rabbitChannel, queue, fnConsumer);
 })

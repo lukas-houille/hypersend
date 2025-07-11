@@ -8,6 +8,6 @@ export const createSenderSendEvents = (req:Request, res:Response) => {
         'Cache-Control': 'no-cache'
     };
     res.writeHead(200, headers);
-    res.write(`Paiment pending\n\n`);
+    res.write(`data: ${JSON.stringify({message: "Order created successfully, waiting for updates..."})}\n\n`);
     currentOrders[req.body.userId] = res;
 }
