@@ -51,7 +51,8 @@ export async function createOrder(userId: number, Orderitems: any[]) {
             client_rating_restaurant: null,
             special_request: null,
             total_price: totalPrice.toString(),
-            canceled_by: null
+            canceled_by: null,
+            ready_at: null
         }).returning();
 
         // update order items with the new order ID

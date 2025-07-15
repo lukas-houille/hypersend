@@ -45,7 +45,7 @@ export async function onRecivedMessage(msg: any, callback: any) {
                 // send to client
                 await rabbitmqPublish(rabbitChannel,"hypersend", "client", {
                     userId: userId,
-                    type: "PAIMENT_CANCELED",
+                    type: "PAIMENT_DECLINED",
                     order: order,
                     items: items
                 });
@@ -53,7 +53,7 @@ export async function onRecivedMessage(msg: any, callback: any) {
             case "VALIDATION_RESTAURANT":
                 // handle restaurant validation
                 const updatedOrder = await updateOrder(order);
-                await rabbitmqPublish(rabbitChannel,"hypersend", "order.*.status", {
+                await rabbitmqPublish(rabbitChannel,"hypersend", "client.driver", {
                     userId: userId,
                     type: "VALIDATION_RESTAURANT",
                     order: updatedOrder,
@@ -65,7 +65,7 @@ export async function onRecivedMessage(msg: any, callback: any) {
                 // update order in database
                 // send to client and restaurant
                 const updatedOrderDriver = await updateOrder(order);
-                await rabbitmqPublish(rabbitChannel,"hypersend", "order.*.status", {
+                await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant", {
                     userId: userId,
                     type: "VALIDATION_DRIVER",
                     order: updatedOrderDriver,
@@ -150,12 +150,16 @@ export async function onRecivedMessage(msg: any, callback: any) {
                 // update order in database if needed
                 // send to client, restaurant
                 const updatedOrderInfo = await updateOrder(order);
-                await rabbitmqPublish(rabbitChannel,"hypersend", "order.*.status", {
+                await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant.driver", {
                     userId: userId,
                     type: "UPDATE",
                     order: updatedOrderInfo,
                     items: items
                 });
+                break;
+            case "DRIVER_STATUS":
+                // handle driver status update
+                // TODO send to client and restaurant the driver status
                 break;
             default:
                 console.error("Unknown message type:", type);

@@ -8,6 +8,7 @@ export async function onRecivedMessage(msg: any, callback: any) {
         switch (type) {
             case "NEW":
                 console.log("Processing new order for user:", userId);
+                // simulate payment processing
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 const isPaymentValidated = Math.random() < 0.9;
                 if (isPaymentValidated) {
