@@ -1,5 +1,5 @@
 import {rabbitChannel} from "../server";
-import {rabbitmqPublish} from "myrabbitconfig";
+import {rabbitmqPublish} from "myrabbitconfig/dist";
 
 export async function onRecivedMessage(msg: any, callback: any) {
     try {
@@ -8,28 +8,28 @@ export async function onRecivedMessage(msg: any, callback: any) {
         switch (type) {
             case "NEW":
                 console.log("Processing new order for user:", userId, "type:", type);
-                // get connected restaurant and ask for validation
-                // if validated, update the order object with accepted at timestamp
-                // and send to driver and restaurant
-                // current timestamp
+                // send to driver for validation
+                // DRIVER_VALIDATION
                 const updatedOrder = {
                     ...order,
-                    accepted_at: new Date(),
+                    driver_id: 1 // initially no driver assigned
                 }
                 await rabbitmqPublish(rabbitChannel, "hypersend", "order", {
                     userId: userId,
-                    type: "VALIDATION_RESTAURANT",
+                    type: "VALIDATION_DRIVER",
                     order: updatedOrder,
                     items: items
                 });
+                // update order with new driver ID
                 break;
-
-            case "UPDATE":
+            case "VALIDATION_RESTAURANT":
                 console.log("Processing new order for user:", userId, "type:", type);
-                // TODO send to the matching restaurant the updated order with SSE
+                // if driver id found, send to driver
+                // if not IDK
                 break;
-            case "DRIVER_STATUS":
-                // TODO send to restaurant the driver status with SSE
+            case "UPDATE":
+                console.log("Updating order for user:", userId);
+                // if driver id found, send to driver
                 break;
             default:
                 console.error("Unknown message type:", type);

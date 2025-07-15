@@ -22,19 +22,18 @@ export async function createOrder(userId: number, Orderitems: any[]) {
         const orderItemsData = Orderitems.map(item => {
             const validItem = validItems.find(validItem => validItem.item_id === item.item_id);
             if (!validItem || !validItem.available || validItem.restaurant_id !== restaurantId) {
-                throw new Error(`Problem with item ID ${item.item_id}`);
+                return;
             }
-            // Calculate total price
             const itemPrice = parseFloat(validItem.price.toString());
             if (isNaN(itemPrice)) {
-                throw new Error(`Invalid price for item with ID ${item.item_id}`);
+                return;
             }
             totalPrice += itemPrice * item.quantity;
             return {
                 order_id: 0, // This will be set later when the order is created
                 restaurant_item_id: restaurantId,
                 quantity: item.quantity,
-                special_request: item.special_request || null
+                special_request: item.special_request ? item.special_request : null
             };
         }).filter(item => item !== null);
 
@@ -57,12 +56,13 @@ export async function createOrder(userId: number, Orderitems: any[]) {
 
         // update order items with the new order ID
         const orderId = newOrder[0].order_id;
-        db.insert(order_items).values(orderItemsData.map(item => ({
+
+        await db.insert(order_items).values(orderItemsData.map(item => ({
             ...item,
             order_id: orderId
         })));
 
-        return newOrder;
+        return newOrder[0];
 
     } catch (error:any) {
         console.error("Error creating order:", error.message);
