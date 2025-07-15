@@ -44,7 +44,6 @@ export async function createOrder(userId: number, Orderitems: any[]) {
             restaurant_id: restaurantId,
             pickup_address_id: null,
             delivery_address_id: null,
-
             accepted_at: null,
             picked_up_at: null,
             delivered_at: null,

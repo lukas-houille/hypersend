@@ -4,7 +4,7 @@ import {onRecivedMessage} from "./utils/handleMessage";
 
 export let rabbitChannel: Channel | null = null;
 
-initConnection((process.env.RABBITMQURL || "amqp://localhost"),"hypersend" , "orderService", "#.order.#", (channel:Channel, queue: string) => {
+initConnection((process.env.RABBITMQURL || "amqp://localhost"),"hypersend" , "paimentService", "#.paiment.#", (channel:Channel, queue: string) => {
     rabbitChannel = channel;
     startConsumer(rabbitChannel,queue, onRecivedMessage);
 })

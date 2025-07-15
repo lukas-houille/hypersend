@@ -26,7 +26,7 @@ export const getOrderData = async (req: Request, res: Response) => {
             let orderData = [];
             if (orderId) {
                 orderData = await retrieveOrderDataByID(orderId, clientId);
-            } else if (startDate && endDate){
+            } else if (startDate && endDate) {
 
                 orderData = await retrieveOrderDataByDates(startDate, endDate, clientId);
             } else {
@@ -54,13 +54,12 @@ export const getOrderData = async (req: Request, res: Response) => {
 
 export const sendOrderRequest = async (req: Request, res: Response) => {
     try {
-        if( rabbitChannel && !currentOrders[req.body.userId] ) {
-            const data = {
+        if (rabbitChannel && !currentOrders[req.body.userId]) {
+            await rabbitmqPublish(rabbitChannel, "hypersend", "order", {
                 userId: req.body.userId,
                 type: "NEW",
-                items: req.body.items,
-            }
-            await rabbitmqPublish(rabbitChannel, "hypersend", "client.order.neworder", {data});
+                items: req.body.items
+            });
             createSenderSendEvents(req, res)
             return;
         } else {

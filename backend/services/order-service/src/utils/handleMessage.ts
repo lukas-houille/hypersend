@@ -6,13 +6,13 @@ import {updateOrder} from "./updateOrder";
 export async function onRecivedMessage(msg: any, callback: any) {
     try {
         const messageContent = JSON.parse(msg.content.toString());
-        const {userId, type, order, items} = messageContent.data;
+        const {userId, type, order, items} = messageContent;
         switch (type) {
             case "NEW":
                 const createdOrder = await createOrder(userId, items);
                 if (!createdOrder) {
                     console.error("Failed to create order");
-                    await rabbitmqPublish(rabbitChannel,"hypersend", "order.client.error", {
+                    await rabbitmqPublish(rabbitChannel,"hypersend", "client",{
                         userId: userId,
                         type: "ORDER_ERROR",
                         order: null,
@@ -20,9 +20,9 @@ export async function onRecivedMessage(msg: any, callback: any) {
                     })
                     break
                 } else {
-                    await rabbitmqPublish(rabbitChannel,"hypersend", "order.client.created", {
+                    await rabbitmqPublish(rabbitChannel,"hypersend", "paiment", {
                         userId: userId,
-                        type: "ORDER_CREATED",
+                        type: "NEW",
                         order: createdOrder,
                         items: items
                     })
@@ -32,18 +32,18 @@ export async function onRecivedMessage(msg: any, callback: any) {
                 // handle payment validated
                 // send to driver and restaurant
                 // update order in database
-                await rabbitmqPublish(rabbitChannel,"hypersend", "order.*.status", {
+                await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant.driver", {
                     userId: userId,
                     type: "PAIMENT_VALIDATED",
                     order: order,
                     items: items
                 });
                 break;
-            case "PAIMENT_CANCELED":
+            case "PAIMENT_DECLINED":
                 // handle payment canceled
                 // updtate order in database
                 // send to client
-                await rabbitmqPublish(rabbitChannel,"hypersend", "order.client.error", {
+                await rabbitmqPublish(rabbitChannel,"hypersend", "client", {
                     userId: userId,
                     type: "PAIMENT_CANCELED",
                     order: order,
