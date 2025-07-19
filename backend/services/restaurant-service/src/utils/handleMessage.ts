@@ -23,13 +23,27 @@ export async function onRecivedMessage(msg: any, callback: any) {
                     items: items
                 });
                 break;
-
+            case "VALIDATION_DRIVER":
+                // simulate order ready at restaurant
+                setTimeout(async () => {
+                    const updatedOrder = {
+                        ...order,
+                        ready_at: new Date(),
+                    };
+                    await rabbitmqPublish(rabbitChannel, "hypersend", "order", {
+                        userId: userId,
+                        type: "UPDATE",
+                        order: updatedOrder,
+                        items: items
+                    });
+                }, 5000);
             case "UPDATE":
                 console.log("Processing new order for user:", userId, "type:", type);
-                // TODO send to the matching restaurant the updated order with SSE
                 break;
             case "DRIVER_STATUS":
-                // TODO send to restaurant the driver status with SSE
+                console.log("Processing order for user:", userId, "type:", type);
+                break;
+            case "CANCELED_ORDER":
                 break;
             default:
                 console.error("Unknown message type:", type);

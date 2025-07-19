@@ -7,5 +7,5 @@ COPY ../package.json /src
 COPY ../tsconfig.json /src
 COPY ../src /src/src
 RUN npm install && npm run build
-EXPOSE 3000
+EXPOSE 3322
 CMD ["node","dist/server.js"]

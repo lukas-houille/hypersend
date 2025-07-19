@@ -31,6 +31,7 @@ export function signIn() {
         const {email, password, role} = req.body;
         const userTable = roleTable[role];
         try {
+            console.log("Signing in user with email:", email, "and role:", role);
             const user = await db.select(
                 {
                     id: userTable.id,
@@ -50,7 +51,8 @@ export function signIn() {
             const token = generateToken( user[0].id, role, email);
             res.status(200).json({token});
         } catch (e) {
-            res.status(500).json({message: "Error signing in", error: e});
+            console.error("Error signing in:", e);
+            res.status(500).json({message: "Error signing in"});
         }
     }
 }

@@ -58,15 +58,16 @@ export async function onRecivedMessage(msg: any, callback: any) {
             case "VALIDATION_RESTAURANT":
                 console.log("Processing order for user:", userId, "type:", type);
                 // handle restaurant validation
+                const orderWithRestaurant = await db.update(orders)
+                    .set({
+                        accepted_at: new Date(order.accepted_at),
+                    })
+                    .where(eq(orders.order_id, order.order_id))
+                    .returning();
                 await rabbitmqPublish(rabbitChannel,"hypersend", "client.driver", {
                     userId: userId,
                     type: "VALIDATION_RESTAURANT",
-                    order: await db.update(orders)
-                        .set({
-                            accepted_at: new Date(order.accepted_at),
-                        })
-                        .where(eq(orders.order_id, order.order_id))
-                        .returning(),
+                    order: orderWithRestaurant[0],
                     items: items
                 });
                 break;
@@ -75,15 +76,16 @@ export async function onRecivedMessage(msg: any, callback: any) {
                 // handle driver validation
                 // update order in database
                 // send to client and restaurant
+                const orderWithDriver = await db.update(orders)
+                    .set({
+                        driver_id: order.driver_id,
+                    })
+                    .where(eq(orders.order_id, order.order_id))
+                    .returning()
                 await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant", {
                     userId: userId,
-                    type: "UPDATE",
-                    order: await db.update(orders)
-                        .set({
-                            driver_id: order.driver_id,
-                        })
-                        .where(eq(orders.order_id, order.order_id))
-                        .returning(),
+                    type: "VALIDATION_DRIVER",
+                    order: orderWithDriver[0],
                     items: items
                 });
                 break;
@@ -115,9 +117,9 @@ export async function onRecivedMessage(msg: any, callback: any) {
                 // handle restaurant canceled, stop everything
                 // check if the order has been picked up
                 if (!order.picked_up_at) {
-                    await rabbitmqPublish(rabbitChannel,"hypersend", "order.*.status", {
+                    await rabbitmqPublish(rabbitChannel,"hypersend", "client.driver", {
                         userId: userId,
-                        type: "CANCELED_RESTAURANT",
+                        type: "CANCELED_ORDER",
                         order: await db.update(orders)
                             .set({
                                 canceled_by: "restaurant",
@@ -128,7 +130,7 @@ export async function onRecivedMessage(msg: any, callback: any) {
                     });
                 }
                 // reject the cancelation if the order has been picked up
-                await rabbitmqPublish(rabbitChannel,"hypersend", "order.restaurant.status", {
+                await rabbitmqPublish(rabbitChannel,"hypersend", "restaurant", {
                     userId: userId,
                     type: "REJECTED_CANCEL",
                     order: order,
@@ -138,9 +140,9 @@ export async function onRecivedMessage(msg: any, callback: any) {
             case "CANCELED_CLIENT":
                 // handle client canceled, check restaurant validation
                 if (!order.accepted_at) {
-                    await rabbitmqPublish(rabbitChannel,"hypersend", "order.*.status", {
+                    await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant.driver", {
                         userId: userId,
-                        type: "CANCELED_CLIENT",
+                        type: "CANCELED_ORDER",
                         order: await db.update(orders)
                             .set({
                                 canceled_by: "client",
@@ -162,20 +164,25 @@ export async function onRecivedMessage(msg: any, callback: any) {
             case "UPDATE":
                 const updatedOrderInfo = await db.update(orders)
                     .set({
-                        ready_at: new Date(order.ready_at),
+                        ready_at: order.ready_at ? new Date(order.ready_at) : null,
+                        picked_up_at: order.picked_up_at ? new Date(order.picked_up_at) : null,
+                        delivered_at: order.delivered_at ? new Date(order.delivered_at) : null,
                     })
                     .where(eq(orders.order_id, order.order_id))
                     .returning();
                 await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant.driver", {
                     userId: userId,
                     type: "UPDATE",
-                    order: updatedOrderInfo,
+                    order: updatedOrderInfo[0],
                     items: items
                 });
                 break;
             case "DRIVER_STATUS":
-                // handle driver status update
-                // TODO send to client and restaurant the driver status
+                await rabbitmqPublish(rabbitChannel,"hypersend", "client.restaurant", {
+                    userId: userId,
+                    type: "DRIVER_STATUS",
+                    positionPercentage: messageContent.positionPercentage
+                });
                 break;
             default:
                 console.error("Unknown message type:", type);
