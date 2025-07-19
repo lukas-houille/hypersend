@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+body {
+  font-family: Avenir Next, Nunito_sans, sans-serif;
+}
+
+@theme {
+  --color-light: #FDFCFD;
+  --color-dark: #140029;
+  --color-primary: #7B00E0;
+  --color-primary-hover: #6a00c0;
+  --color-premary-shade: #C37AFF;
+  --color-light-gray: #F5F5F5;
+  --color-gray: #B0B0B0;
+  --color-dark-gray: #716977;
+  --color-error: #E00B00;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "paiment-service",
+  "version": "1.0.0",
+  "description": "This service is responsible for managing client-related operations in the Hypersend application. It handles client orders and keep the client updated with Server-Sent Events.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.8",
+    "myrabbitconfig": "file:../rabbit-service"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
