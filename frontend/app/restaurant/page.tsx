@@ -1,16 +1,15 @@
 'use client'
-
-import { useSearchParams } from 'next/navigation'
+import {useSearchParams} from 'next/navigation'
 import Header from "@/src/components/header";
 import {useEffect, useState} from "react";
 
 interface RestaurantItems {
-    id: number;
-    name: string;
-    type: string;
-    description?: string;
-    // items list
-    items?: {
+    restaurant: {
+        id: number;
+        name: string;
+        description?: string;
+    },
+    items: {
         id: number;
         name: string;
         price: number;
@@ -21,11 +20,23 @@ interface RestaurantItems {
 
 function addToCart(item: { id: number; name: string; price: number }) {
     // this function stores items in local storage
+    // ensure cart items are from same restaurant
+    // if the item is already in the cart with same special requests, update the quantity
+    // otherwise, add the item to the cart
     return () => {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        cart.push(item);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        alert(`${item.name} has been added to your cart!`);
+        if (typeof window !== 'undefined') {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existingItemIndex = cart.findIndex((cartItem: { id: number; name: string; price: number }) => cartItem.id === item.id);
+            if (existingItemIndex > -1) {
+                // Item already exists, update quantity or special requests
+                cart[existingItemIndex].quantity = (cart[existingItemIndex].quantity || 1) + 1;
+            } else {
+                // Add new item to cart
+                cart.push({ ...item, quantity: 1 });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert(`${item.name} added to cart!`);
+        }
     };
 }
 
@@ -43,29 +54,28 @@ export default function Home() {
         try {
             const response = await fetch(`http://localhost:3001/api/restaurants/${id}`);
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                console.error(response);
             }
-            const data = await response.json();
-            return data;
+            return await response.json();
         } catch (error) {
             console.error('Error fetching restaurant:', error);
         }
     };
-    const [restaurant, setRestaurant] = useState<RestaurantItems[]>([]);
+    const [data, setdata] = useState<RestaurantItems | null>(null);
     useEffect(() => {
-        const getRestaurant = async () => {
+        const getdata = async () => {
             const data = await fetchRestaurantAndItems(params.id);
             if (data) {
-                setRestaurant(data);
+                setdata(data);
             }
         };
-        getRestaurant();
+        getdata();
     }, [params.id]);
 
     return (
         <div className="flex flex-col items-center justify-start h-screen bg-gray-100">
             <Header/>
-            {restaurant ? (
+            {data ? (
                 <div className="flex flex-col w-screen">
                     <div className="max-w-2xl p-4">
                         <button
@@ -76,14 +86,13 @@ export default function Home() {
                         </button>
                     </div>
                     <div className="max-w-2xl p-4">
-                        <h1 className="text-2xl font-bold mb-4">{restaurant.name}</h1>
-                        <p className="text-gray-700 mb-4">{restaurant.description}</p>
-                        <p className="text-gray-600">Type: {restaurant.type}</p>
+                        <h1 className="text-2xl font-bold mb-4">{data.restaurant.name}</h1>
+                        <p className="text-gray-700 mb-4">{data.restaurant.description}</p>
                     </div>
                     <div className="max-w-2xl w-screen p-4">
                         <h2 className="text-xl font-semibold mb-4">Menu Items</h2>
                         <div className="flex flex-row overflow-auto gap-4">
-                            {restaurant.items?.map((item) => (
+                            {data.items?.map((item) => (
                                 <div key={item.id}
                                      className="bg-white w-lg p-4 rounded-lg shadow hover:shadow-lg">
                                     <img
@@ -91,7 +100,7 @@ export default function Home() {
                                         alt={item.name}
                                         className="w-full h-32 object-cover rounded mb-2"/>
                                     <h3 className="font-bold">{item.name}</h3>
-                                    <p className="text-gray-600">${item.price.toFixed(2)}</p>
+                                    <p className="text-gray-600">{item.price.toFixed(2)} €</p>
                                     {item.description && <p className="text-gray-500 text-sm">{item.description}</p>}
                                     <button
                                         className="mt-2 px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition cursor-pointer"

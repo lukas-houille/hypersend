@@ -1,12 +1,14 @@
-import {boolean, bigint, pgTable, varchar, numeric, timestamp} from "drizzle-orm/pg-core";
+
+import {bigint, pgTable, varchar, timestamp, boolean} from "drizzle-orm/pg-core";
 
 export const items = pgTable("items", {
-    item_id: bigint("item_id", {mode: "number"}).primaryKey().generatedByDefaultAsIdentity(),
-    restaurant_id: bigint("restaurant_id", {mode: "number"}).notNull(),
-    name: varchar("name", {length: 255}).notNull(),
-    type: varchar("type", {length: 50}).notNull(),
-    price: numeric("price", {precision: 10, scale: 2}).notNull(),
-    description: varchar("description", {length: 500}),
-    created_at: timestamp("created_at").defaultNow().notNull(),
-    available: boolean("available").default(true).notNull(),
+    id: bigint("item_id", { mode: "number" }).primaryKey().generatedByDefaultAsIdentity(),
+    restaurant_id: bigint("restaurant_id", { mode: "number" }).notNull(),
+    name: varchar("name", { length: 100 }).notNull(),
+    type: varchar("type", { length: 50 }).notNull(),
+    price: bigint("price", { mode: "number" }).notNull(),
+    description: varchar("description", { length: 1024 }),
+    created_at: timestamp("created_at").defaultNow(),
+    available: boolean("available"),
+    img_url: varchar("img_url", { length: 512 })
 });

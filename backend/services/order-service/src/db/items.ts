@@ -1,7 +1,7 @@
 import {boolean, bigint, pgTable, varchar, numeric, timestamp} from "drizzle-orm/pg-core";
 
 export const items = pgTable("items", {
-    item_id: bigint("item_id", {mode: "number"}).primaryKey().generatedByDefaultAsIdentity(),
+    id: bigint("item_id", {mode: "number"}).primaryKey().generatedByDefaultAsIdentity(),
     restaurant_id: bigint("restaurant_id", {mode: "number"}).notNull(),
     name: varchar("name", {length: 255}).notNull(),
     type: varchar("type", {length: 50}).notNull(),

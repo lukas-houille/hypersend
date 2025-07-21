@@ -12,7 +12,6 @@ export const orders = pgTable("orders", {
     pickup_address_id: bigint("pickup_address_id",{mode:"number"}).references(() => address.address_id),
     delivery_address_id: bigint("delivery_address_id",{mode:"number"}).references(() => address.address_id),
     accepted_at: timestamp("accepted_at"),
-    ready_at: timestamp("ready_at"),
     picked_up_at: timestamp("picked_up_at"),
     delivered_at: timestamp("delivered_at"),
     created_at: timestamp("created_at").defaultNow(),
@@ -20,5 +19,6 @@ export const orders = pgTable("orders", {
     client_rating_restaurant: varchar("client_rating_restaurant", { length: 5 }),
     special_request: varchar("special_request", { length: 255 }),
     total_price: numeric("total_price", { precision: 10, scale: 2 }), // total price of the order, can be a string to handle large numbers
-    canceled_by: varchar("canceled_by", { length: 20 }) // "client", "restaurant", "driver", "none",
+    canceled_by: varchar("canceled_by", { length: 20 }), // "client", "restaurant", "driver", "none",
+    ready_at: timestamp("ready_at"), // when the order is ready to be picked up by the driver
 });
