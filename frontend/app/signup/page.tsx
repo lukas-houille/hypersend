@@ -21,7 +21,7 @@ export default function SignUp() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            localStorage.setItem('userId', data.userId);
             // Redirect or update UI as needed
             router.push(`/${data.role}`);
         } else {

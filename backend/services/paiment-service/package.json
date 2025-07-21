@@ -1,5 +1,5 @@
 {
-  "name": "paiment-service",
+  "name": "driver-service",
   "version": "1.0.0",
   "description": "This service is responsible for managing client-related operations in the Hypersend application. It handles client orders and keep the client updated with Server-Sent Events.",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "amqplib": "^0.10.8",
-    "myrabbitconfig": "file:../rabbit-service"
+    "myrabbitconfig": "^1.0.0"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.7",

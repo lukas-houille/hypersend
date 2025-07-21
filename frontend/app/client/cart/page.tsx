@@ -3,13 +3,14 @@ import React, { useEffect, useState } from "react";
 import Header from "@/src/components/header";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import {apiUrl} from "@/src/config";
+import {useRouter} from "next/navigation";
 
 export default function Home() {
     // This page is for displaying the user's cart
     // It will show the items in the cart and allow the user to proceed to checkout
     // The cart data is stored in local storage
     const [cart, setCart] = useState<{ id: number; name: string; price: number; quantity: number }[]>([]);
-
+    const router = useRouter();
     const sendOrderRequest = async () => {
         if (typeof window !== "undefined") {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -20,7 +21,6 @@ export default function Home() {
                         Accept: "text/event-stream",
                         Connection: "keep-alive",
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                     body: JSON.stringify({
                         userId: localStorage.getItem('userId'),
@@ -50,7 +50,8 @@ export default function Home() {
                             // redirect to order tracking page or show order details
                             localStorage.removeItem('cart');
                             setCart([]);
-                            window.location.href = "client/track-order";
+                            // Redirect to order tracking page
+                            router.push("/client/track-order");
                         }
                     },
                     onclose() {

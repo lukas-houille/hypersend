@@ -27,7 +27,7 @@ export function signUp() {
                 maxAge: 3600 * 1000,    // 1 hour in milliseconds
                 path: '/',
             });
-            res.status(200).json({role: role});
+            res.status(200).json({role: role, userId: newUser[0].id});
         } catch (e) {
             res.status(500).json({message: "Error creating user", error: e});
         }
@@ -64,7 +64,7 @@ export function signIn() {
                 maxAge: 3600 * 1000,    // 1 hour in milliseconds
                 path: '/',
             });
-            res.status(200).json({role: role});
+            res.status(200).json({role: role, userId: user[0].id});
         } catch (e) {
             console.error("Error signing in:", e);
             res.status(500).json({message: "Error signing in"});

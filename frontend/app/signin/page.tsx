@@ -22,6 +22,7 @@ export default function SignIn() {
         if (response.ok) {
             const data = await response.json();
             // Redirect or update UI as needed
+            localStorage.setItem('userId', data.userId);
             router.push(`/${data.role}`);
         } else {
             // Handle error (show message, etc.)

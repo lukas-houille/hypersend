@@ -1,5 +1,5 @@
 import {createOrder} from "./createOrder";
-import {rabbitmqPublish} from "myrabbitconfig/dist";
+import {rabbitmqPublish} from "myrabbitconfig";
 import {rabbitChannel} from "../server";
 import {db} from "../db";
 import {orders} from "../db/orders";
