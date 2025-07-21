@@ -1,7 +1,9 @@
 'use client'
 import {useSearchParams} from 'next/navigation'
 import Header from "@/src/components/header";
-import {useEffect, useState} from "react";
+import {useEffect, useState, Suspense} from "react";
+import {apiUrl} from "@/src/config";
+import Image from "next/image";
 
 interface RestaurantItems {
     restaurant: {
@@ -40,37 +42,48 @@ function addToCart(item: { id: number; name: string; price: number }) {
     };
 }
 
-export default function Home() {
+function RestaurantPageContent() {
     const searchParams = useSearchParams();
     const params = Object.fromEntries(searchParams.entries());
+    const [data, setdata] = useState<RestaurantItems | null>(null);
+
+    useEffect(() => {
+        const fetchRestaurantAndItems = async (id: string) => {
+            try {
+                const response = await fetch(`${apiUrl}/api/restaurants/${id}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+                if (!response.ok) {
+                    console.error(response);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching restaurant:', error);
+            }
+        };
+
+        if (params.id) {
+            const getdata = async () => {
+                const data = await fetchRestaurantAndItems(params.id);
+                if (data) {
+                    setdata(data);
+                }
+            };
+            getdata();
+        }
+    }, [params.id]);
+
     if (!params.id) {
         return <div className="flex flex-col items-center justify-top h-screen bg-gray-100">
             <Header/>
             <h1 className={"font-black italic"}>No restaurant selected</h1>
         </div>;
     }
-    // try to fetch restaurant data using params.id
-    const fetchRestaurantAndItems = async (id: string) => {
-        try {
-            const response = await fetch(`http://localhost:3001/api/restaurants/${id}`);
-            if (!response.ok) {
-                console.error(response);
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching restaurant:', error);
-        }
-    };
-    const [data, setdata] = useState<RestaurantItems | null>(null);
-    useEffect(() => {
-        const getdata = async () => {
-            const data = await fetchRestaurantAndItems(params.id);
-            if (data) {
-                setdata(data);
-            }
-        };
-        getdata();
-    }, [params.id]);
 
     return (
         <div className="flex flex-col items-center justify-start h-screen bg-gray-100">
@@ -95,9 +108,11 @@ export default function Home() {
                             {data.items?.map((item) => (
                                 <div key={item.id}
                                      className="bg-white w-lg p-4 rounded-lg shadow hover:shadow-lg">
-                                    <img
-                                        src={item.img_url || '/placeholder.png'}
+                                    <Image
+                                        src={item.img_url ? item.img_url : '/placeholder.png'}
                                         alt={item.name}
+                                        width={200}
+                                        height={128}
                                         className="w-full h-32 object-cover rounded mb-2"/>
                                     <h3 className="font-bold">{item.name}</h3>
                                     <p className="text-gray-600">{item.price.toFixed(2)} €</p>
@@ -118,4 +133,12 @@ export default function Home() {
             )}
         </div>
     );
+}
+
+export default function RestaurantPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <RestaurantPageContent />
+        </Suspense>
+    )
 }

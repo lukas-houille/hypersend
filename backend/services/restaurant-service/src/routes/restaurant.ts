@@ -7,7 +7,6 @@ import {items} from "../db/items";
 export const restaurantRoute = express.Router();
 
 restaurantRoute.get("/", async (req, res) => {
-    // This is a placeholder for actual restaurant data
     const selectedRestaurants = await db.select().from(restaurant).limit(10);
     res.status(200).json(selectedRestaurants);
 });

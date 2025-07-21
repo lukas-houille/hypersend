@@ -3,8 +3,17 @@ import { useState, useEffect } from 'react';
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Header from "@/src/components/header";
 
+interface OrderEvent {
+    type: string;
+    order: {
+        delivered_at?: string | null;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
 export default function SSEPage() {
-    const [orderData, setOrderData] = useState<any[]>([]);
+    const [orderData, setOrderData] = useState<OrderEvent[]>([]);
 
     useEffect(() => {
         localStorage.removeItem('cart');
@@ -37,11 +46,11 @@ export default function SSEPage() {
                         if (event.data) {
                             try {
                                 // type is UPDATE and delivered_at is not null
-                                const parsedData = JSON.parse(event.data);
+                                const parsedData: OrderEvent = JSON.parse(event.data);
                                 console.log(parsedData);
                                 if (parsedData.type === "UPDATE" && parsedData.order.delivered_at) {
                                     alert("Your order has been delivered!");
-                                    window.location.href = "/";
+                                    window.location.href = "/client/browse";
                                 }
                                 setOrderData(prev => [...prev, parsedData]);
                             } catch (e) {

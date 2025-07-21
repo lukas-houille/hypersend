@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "@/src/components/header";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import {apiUrl} from "@/src/config";
 
 export default function Home() {
     // This page is for displaying the user's cart
@@ -13,7 +14,7 @@ export default function Home() {
         if (typeof window !== "undefined") {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             try {
-                await fetchEventSource("http://localhost:3002/api/client-service/neworder", {
+                await fetchEventSource(`${apiUrl}/api/client-service/neworder`, {
                     method: "POST",
                     headers: {
                         Accept: "text/event-stream",
@@ -22,7 +23,7 @@ export default function Home() {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                     body: JSON.stringify({
-                        userId: 1,
+                        userId: localStorage.getItem('userId'),
                         role: "client",
                         items: cart,
                     }),
@@ -49,7 +50,7 @@ export default function Home() {
                             // redirect to order tracking page or show order details
                             localStorage.removeItem('cart');
                             setCart([]);
-                            window.location.href = "/track-order";
+                            window.location.href = "client/track-order";
                         }
                     },
                     onclose() {

@@ -2,8 +2,10 @@
 import { useRouter } from 'next/navigation';
 
 import LogoFull from '@/src/icons/logoFull.jsx';
+import {apiUrl} from "@/src/config";
+import React from "react";
 
-export default function Login() {
+export default function SignIn() {
     const router = useRouter();
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -11,18 +13,16 @@ export default function Login() {
         const email = formData.get('email');
         const password = formData.get('password');
 
-        const response = await fetch('http://localhost:3322/api/auth/signin', {
+        const response = await fetch(`${apiUrl}/api/auth/signin`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ "email":email, "password":password, "role": "client"}), // TODO remove hardcoded role
-            credentials: 'include', // Include cookies in the request
         });
 
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('token', data.token); // or sessionStorage
             // Redirect or update UI as needed
-            router.push('/browse');
+            router.push(`/${data.role}`);
         } else {
             // Handle error (show message, etc.)
             const errorData = await response.json();
@@ -92,7 +92,7 @@ export default function Login() {
 
                 <p className="mt-10 text-center text-sm/6 text-dark-gray">
                     Not a member?{' '}
-                    <a href="#" className="font-semibold text-primary hover:text-primary-hover">
+                    <a href="/signup" className="font-semibold text-primary hover:text-primary-hover">
                         Register now
                     </a>
                 </p>

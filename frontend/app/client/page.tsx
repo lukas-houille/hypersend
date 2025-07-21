@@ -1,6 +1,8 @@
 "use client";
 import Header from '../../src/components/header';
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
+import {apiUrl} from "@/src/config";
+import Image from "next/image";
 
 interface RestaurantType {
     id: number;
@@ -18,14 +20,22 @@ export default function Home() {
 
     const fetchRestaurants = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/restaurants/');
+            const response = await fetch(`${apiUrl}/api/restaurants/`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                console.error("Failed to fetch restaurants:", response.statusText);
+                return [];
             }
-            const data = await response.json();
-            return data;
+            return await response.json();
         } catch (error) {
             console.error('Error fetching restaurants:', error);
+            return [];
         }
     };
 
@@ -33,7 +43,7 @@ export default function Home() {
     useEffect(() => {
         const getRestaurants = async () => {
             const data = await fetchRestaurants();
-            if (data) {
+            if (Array.isArray(data)) {
                 setRestaurants(data);
             }
         };
@@ -48,12 +58,14 @@ export default function Home() {
                     {restaurants.map((restaurant) => (
                         <a
                             key={restaurant.id}
-                            href={`/restaurant?id=${restaurant.id}`}
+                            href={`/client/restaurant?id=${restaurant.id}`}
                             className="bg-white p-4 rounded-lg shadow hover:bg-gray-50 transition flex flex-col items-center"
                         >
-                            <img
-                                src={restaurant.img_url}
+                            <Image
+                                src={restaurant.img_url ? restaurant.img_url : '/placeholder.png'}
                                 alt={restaurant.name}
+                                width={200}
+                                height={128}
                                 className="w-full h-32 object-cover rounded mb-2"
                             />
                             <h2 className="font-bold mt-2 text-center">{restaurant.name}</h2>
