@@ -11,7 +11,7 @@ export const JWT_SECRET = process.env.JWT_SECRET? process.env.JWT_SECRET : "defa
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:3000", // your frontend URL
+    origin: ["http://localhost:3000", "http://localhost"], // your frontend URL
 }));
 
 app.use(express.json());

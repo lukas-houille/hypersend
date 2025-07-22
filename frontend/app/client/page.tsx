@@ -1,7 +1,6 @@
 "use client";
 import Header from '../../src/components/header';
 import {useEffect, useState} from 'react';
-import {apiUrl} from "@/src/config";
 import Image from "next/image";
 
 interface RestaurantType {
@@ -20,7 +19,7 @@ export default function Home() {
 
     const fetchRestaurants = async () => {
         try {
-            const response = await fetch(`${apiUrl}/api/restaurants/`,
+            const response = await fetch(`/api/restaurants/`,
                 {
                     method: 'GET',
                     headers: {

@@ -2,7 +2,6 @@
 import {useSearchParams} from 'next/navigation'
 import Header from "@/src/components/header";
 import {useEffect, useState, Suspense} from "react";
-import {apiUrl} from "@/src/config";
 import Image from "next/image";
 
 interface RestaurantItems {
@@ -50,7 +49,7 @@ function RestaurantPageContent() {
     useEffect(() => {
         const fetchRestaurantAndItems = async (id: string) => {
             try {
-                const response = await fetch(`${apiUrl}/api/restaurants/${id}`,
+                const response = await fetch(`/api/restaurants/${id}`,
                     {
                         method: 'GET',
                         headers: {

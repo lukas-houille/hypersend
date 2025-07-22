@@ -86,14 +86,10 @@ export const getOrderTracking = async (req: Request, res: Response) => {
             res.status(404).json({message: "No tracking information found for this order"});
             return;
         } else {
-            const headers = {
-                'Content-Type': 'text/event-stream',
-                'Connection': 'keep-alive',
-                'Cache-Control': 'no-cache'
-            };
-            res.writeHead(200, headers);
-            res.write(`Order tracking for user ${userId}\n\n`);
-            currentOrders[userId] = res;
+            createSenderSendEvents(
+                req,
+                res,
+            )
         }
     } catch (error) {
         console.error("Error in getOrderTracking:", error);

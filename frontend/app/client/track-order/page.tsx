@@ -16,19 +16,17 @@ export default function SSEPage() {
     const [orderData, setOrderData] = useState<OrderEvent[]>([]);
 
     useEffect(() => {
-        localStorage.removeItem('cart');
-        const fetchSSE = async () => {
+        const trackOrder = async () => {
             try {
-                await fetchEventSource("http://localhost:3002/api/client-service/orderTracking", {
+                await fetchEventSource(`/api/client-service/orderTracking`, {
                     method: "POST",
                     headers: {
                         Accept: "text/event-stream",
                         Connection: "keep-alive",
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                     body: JSON.stringify({
-                        userId: 1,
+                        userId: localStorage.getItem("userId"),
                         role: "client",
                     }),
                     onopen: async (res) => {
@@ -50,7 +48,7 @@ export default function SSEPage() {
                                 console.log(parsedData);
                                 if (parsedData.type === "UPDATE" && parsedData.order.delivered_at) {
                                     alert("Your order has been delivered!");
-                                    window.location.href = "/client/browse";
+                                    window.location.href = "/client/";
                                 }
                                 setOrderData(prev => [...prev, parsedData]);
                             } catch (e) {
@@ -70,7 +68,7 @@ export default function SSEPage() {
                 alert("Failed to track order. Please try again.");
             }
         };
-        fetchSSE();
+        trackOrder();
     }, []);
 
     return (
