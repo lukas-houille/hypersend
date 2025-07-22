@@ -12,5 +12,41 @@
   </p>
 </p>
 
-## Features
+## About The Project
 
+Hypersend is a distributed food delivery service clone that brings your favorite meals from local restaurants right to your doorstep. Built with a microservices architecture, it ensures scalability, resilience, and maintainability.
+
+## Project Architecture
+
+The project is composed of several microservices, each responsible for a specific domain:
+
+-   **Authentication Service**: Manages user authentication and authorization.
+-   **Restaurant Service**: Handles restaurant data, menus, and orders.
+-   **Driver Service**: Manages driver information and delivery assignments.
+-   **Client Service**: Provides the main interface for customers to browse restaurants and place orders.
+-   **Payment Service**: Processes payments for orders.
+-   **Frontend Service**: The user interface for the application.
+
+## Getting Started
+
+To get a local copy up and running follow these simple steps.
+
+### Prerequisites
+
+-   Docker
+-   Docker Compose
+
+### Installation
+
+1.  Run the following command to set up and start the project:
+    ```sh
+    mkdir hypersend && cd hypersend && mkdir conf && \
+    curl -o compose.yaml https://raw.githubusercontent.com/lukas-houille/hypersend/main/compose.yaml && \
+    curl -o conf/init.sql https://raw.githubusercontent.com/lukas-houille/hypersend/main/conf/init.sql && \
+    docker-compose up -d
+    ```
+2.  The application will be available at `http://localhost`
+
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.

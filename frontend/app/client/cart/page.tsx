@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "@/src/components/header";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import {apiUrl} from "@/src/config";
 import {useRouter} from "next/navigation";
 
 export default function Home() {
@@ -15,7 +14,7 @@ export default function Home() {
         if (typeof window !== "undefined") {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             try {
-                await fetchEventSource(`${apiUrl}/api/client-service/neworder`, {
+                await fetchEventSource(`/api/client-service/neworder`, {
                     method: "POST",
                     headers: {
                         Accept: "text/event-stream",
@@ -56,9 +55,6 @@ export default function Home() {
                     },
                     onclose() {
                         console.log("Connection closed by the server");
-                    },
-                    onerror(err) {
-                        console.log("There was an error from server", err);
                     },
                 });
             } catch (error) {

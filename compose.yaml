@@ -1,0 +1,188 @@
+services:
+  auth-service:
+    image: xentey/auth-service:latest
+    container_name: auth-service
+    hostname: auth-service
+    restart: always
+    ports:
+      - "3002:3000"
+    environment:
+      - DB_HOST=postgres
+      - JWT_SECRET_KEY=your_jwt_secret_key
+      - DB_USER=authservice
+      - DB_PASSWORD=password
+      - DB_NAME=hypersend
+      - CORS_ORIGIN="http://localhost" # rplace with your domain name
+    networks:
+      - caddy
+      - postgres
+
+  restaurant-service:
+    image: xentey/restaurant-service:latest
+    container_name: restaurantService
+    hostname: restaurant-service
+    restart: always
+    ports:
+      - "3003:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQURL=amqp://rabbitmq
+      - DB_HOST=postgres
+      - DB_USER=restaurantservice
+      - DB_PASSWORD=password
+      - DB_NAME=hypersend
+    networks:
+      - caddy
+      - postgres
+      - rabbitmq
+
+  driver-service:
+    image: xentey/driver-service:latest
+    container_name: driverService
+    hostname: driver-service
+    restart: always
+    ports:
+      - "3004:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQURL=amqp://rabbitmq
+      - DB_HOST=postgres
+      - DB_USER=driverservice
+      - DB_PASSWORD=password
+      - DB_NAME=hypersend
+    networks:
+      - caddy
+      - postgres
+      - rabbitmq
+
+  client-service:
+    image: xentey/client-service:latest
+    container_name: clientService
+    hostname: client-service
+    restart: always
+    ports:
+      - "3005:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQURL=amqp://rabbitmq
+      - DB_HOST=postgres
+      - DB_USER=clientservice
+      - DB_PASSWORD=password
+      - DB_NAME=hypersend
+      - CORS_ORIGIN="http://localhost"
+    networks:
+      - caddy
+      - postgres
+      - rabbitmq
+
+  paiment-service:
+    image: xentey/paiment-service:latest
+    container_name: paimentService
+    hostname: paiment-service
+    restart: always
+    ports:
+      - "3006:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQURL=amqp://rabbitmq
+    networks:
+      - caddy
+      - rabbitmq
+
+  frontend-service:
+    image: xentey/frontend:latest
+    container_name: frontend-service
+    hostname: frontend-service
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - caddy
+
+  order-service:
+    image: xentey/order-service
+    container_name: orderService
+    hostname: order-service
+    restart: always
+    ports:
+      - "3001:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQURL=amqp://rabbitmq
+      - DB_HOST=postgres
+      - DB_USER=orderservice
+      - DB_PASSWORD=password
+      - DB_NAME=hypersend
+    networks:
+      - caddy
+      - postgres
+      - rabbitmq
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hypersend
+    volumes:
+      - ./conf/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    hostname: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf:/etc/caddy
+      - ./site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - caddy
+
+  rabbitmq:
+    image: rabbitmq:4.1.2-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - caddy
+      - rabbitmq
+
+networks:
+  postgres:
+    driver: bridge
+  caddy:
+    driver: bridge
+  rabbitmq:
+    driver: bridge
+
+volumes:
+    postgres_data:
+        driver: local
+    caddy_data:
+        driver: local
+    caddy_config:
+        driver: local

@@ -8,7 +8,7 @@ import cors from 'cors';
 const app = express();
 
 app.use(cors({
-    origin: (process.env.CORS_ORIGIN || "http://localhost:3000"),
+    origin: [process.env.CORS_ORIGIN || "http://localhost:3000", "http://localhost"],
     credentials: true, // Allow credentials to be sent
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
@@ -39,7 +39,7 @@ function sendToClient(msg: any, callback: any) {
         })}\n\n`);
         if (type === "UPDATE" && order.delivered_at || type === "PAIMENT_DECLINED") {
             currentOrders[userId].end();
-            console.log("Closing connection after delivery for user:", userId);
+            console.log("Closing connection", userId);
             delete currentOrders[userId];
         }
     } else {

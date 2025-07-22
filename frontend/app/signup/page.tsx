@@ -2,7 +2,6 @@
 import { useRouter } from 'next/navigation';
 
 import LogoFull from '@/src/icons/logoFull.jsx';
-import {apiUrl} from "@/src/config";
 import React from "react";
 
 export default function SignUp() {
@@ -13,7 +12,7 @@ export default function SignUp() {
         const email = formData.get('email');
         const password = formData.get('password');
 
-        const response = await fetch(`${apiUrl}/api/auth/signup`, {
+        const response = await fetch(`api/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ "email":email, "password":password, "role": "client"}), // TODO remove hardcoded role
