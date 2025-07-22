@@ -4,19 +4,15 @@ import {db} from "../db";
 import {eq} from "drizzle-orm";
 import {roleTable} from "../db/schema";
 
-export function authMiddleware(requiredRoles: string[] = []) {
+export function authMiddleware(role: string) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const role = requiredRoles[0]
-        const token = req.headers["x-access-token"] || req.headers["authorization"];
+        const token = req.cookies['auth_token'];
         if (!token) {
             res.status(403).json({ message: "No token provided!" });
             return;
         }
-        const actualToken = token.toString().startsWith("Bearer ")
-            ? token.slice(7, token.length).toString()
-            : token.toString();
         try{
-            const decodedToken = verifyToken(actualToken)
+            const decodedToken = verifyToken(token)
             if (decodedToken.role != role) {
                 res.status(403).json({ message: "Unauthorized" });
                 return;
@@ -27,6 +23,12 @@ export function authMiddleware(requiredRoles: string[] = []) {
                 res.status(403).json({ message: "Unauthorized" });
                 return;
             }
+            // Attach user information to the request object
+            req.body = {
+                email: decodedToken.email,
+                role: decodedToken.role,
+                userId: Number(user[0].id)
+            };
             next()
         } catch (error){
             res.status(403).json({})

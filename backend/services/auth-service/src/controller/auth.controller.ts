@@ -5,6 +5,7 @@ import {generateToken} from "../utils/jwt";
 import {Request, Response} from "express";
 import {eq} from "drizzle-orm";
 
+
 export function signUp() {
     return async (req: Request, res: Response) => {
         const {email, password, role} = req.body;
@@ -19,7 +20,14 @@ export function signUp() {
         try {
             const newUser = await db.insert(userTable).values({ email:email, password_hash: hashed}).returning();
             const token = generateToken( newUser[0].id, role, email);
-            res.status(200).json({token});
+            res.cookie('auth_token', token, {
+                httpOnly: true,         // Prevents client-side JS from accessing the cookie
+                secure: process.env.NODE_ENV === 'production', // Only send over HTTPS
+                sameSite: 'lax',        // CSRF protection
+                maxAge: 3600 * 1000,    // 1 hour in milliseconds
+                path: '/',
+            });
+            res.status(200).json({role: role, userId: newUser[0].id});
         } catch (e) {
             res.status(500).json({message: "Error creating user", error: e});
         }
@@ -31,6 +39,7 @@ export function signIn() {
         const {email, password, role} = req.body;
         const userTable = roleTable[role];
         try {
+            console.log("Signing in user with email:", email, "and role:", role);
             const user = await db.select(
                 {
                     id: userTable.id,
@@ -48,9 +57,17 @@ export function signIn() {
                 return;
             }
             const token = generateToken( user[0].id, role, email);
-            res.status(200).json({token});
+            res.cookie('auth_token', token, {
+                httpOnly: true,         // Prevents client-side JS from accessing the cookie
+                secure: process.env.NODE_ENV === 'production', // Only send over HTTPS
+                sameSite: 'lax',        // CSRF protection
+                maxAge: 3600 * 1000,    // 1 hour in milliseconds
+                path: '/',
+            });
+            res.status(200).json({role: role, userId: user[0].id});
         } catch (e) {
-            res.status(500).json({message: "Error signing in", error: e});
+            console.error("Error signing in:", e);
+            res.status(500).json({message: "Error signing in"});
         }
     }
 }
