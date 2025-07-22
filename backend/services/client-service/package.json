@@ -1,0 +1,28 @@
+{
+  "name": "client-service",
+  "version": "1.0.0",
+  "description": "This service is responsible for managing client-related operations in the Hypersend application. It handles client orders and keep the client updated with Server-Sent Events.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.8",
+    "cors": "^2.8.5",
+    "drizzle-orm": "^0.32.1",
+    "express": "^4.19.2",
+    "myrabbitconfig": "^1.0.0",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/pg": "^8.11.6",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
