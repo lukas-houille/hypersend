@@ -8,6 +8,7 @@ export const createSenderSendEvents = (req:Request, res:Response) => {
         'Cache-Control': 'no-cache'
     };
     res.writeHead(200, headers);
-    res.write(`data: ${JSON.stringify({message: "Order created successfully, waiting for updates..."})}\n\n`);
+    res.write(`data: ${JSON.stringify({message: "Connected, waiting for updates..."})}\n\n`);
     currentOrders[req.body.userId] = res;
+    console.log(`SSE connection established for user ${req.body.userId}`);
 }

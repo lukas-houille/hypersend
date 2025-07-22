@@ -9,7 +9,7 @@ import {bigint, pgTable, varchar} from "drizzle-orm/pg-core";
 import {orders} from "./orders";
 
 export const order_items = pgTable("order_items", {
-    order_item_id: bigint("order_item_id", {mode: "number"}).primaryKey().generatedByDefaultAsIdentity(),
+    id: bigint("order_item_id", {mode: "number"}).primaryKey().generatedByDefaultAsIdentity(),
     order_id: bigint("order_id", {mode: "number"}).notNull().references(() => orders.order_id),
     restaurant_item_id: bigint("restaurant_item_id", {mode: "number"}).notNull(),
     quantity: bigint("quantity", {mode: "number"}).notNull(),

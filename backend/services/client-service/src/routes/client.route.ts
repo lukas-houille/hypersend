@@ -10,7 +10,7 @@ clientRoute.get("/orders", getOrderData );
 
 clientRoute.post("/neworder", sendOrderRequest);
 
-clientRoute.get("/order-tracking/", getOrderTracking);
+clientRoute.post("/orderTracking", getOrderTracking);
 
 clientRoute.post("/rating", defaultResponse);
 

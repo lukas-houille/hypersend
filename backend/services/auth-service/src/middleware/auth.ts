@@ -6,16 +6,13 @@ import {roleTable} from "../db/schema";
 
 export function authMiddleware(role: string) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const token = req.headers["x-access-token"] || req.headers["authorization"];
+        const token = req.cookies['auth_token'];
         if (!token) {
             res.status(403).json({ message: "No token provided!" });
             return;
         }
-        const actualToken = token.toString().startsWith("Bearer ")
-            ? token.slice(7, token.length).toString()
-            : token.toString();
         try{
-            const decodedToken = verifyToken(actualToken)
+            const decodedToken = verifyToken(token)
             if (decodedToken.role != role) {
                 res.status(403).json({ message: "Unauthorized" });
                 return;

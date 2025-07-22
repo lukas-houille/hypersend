@@ -1,0 +1,71 @@
+localhost:80 {
+
+	handle /_next/* {
+		reverse_proxy frontend-service:3000
+	}
+
+	handle /favicon.ico {
+		reverse_proxy frontend-service:3000
+	}
+	# Route-based matching with auth check before responding
+	handle /client/* {
+    	forward_auth auth-service:3000 {
+    		uri /client/validate
+    		copy_headers Authorization
+    	}
+    	reverse_proxy frontend-service:3000
+    }
+
+	handle /driver/* {
+		forward_auth auth-service:3000 {
+			uri /driver/validate
+			copy_headers Authorization
+		}
+		reverse_proxy frontend-service:3000
+	}
+
+	handle /restaurant/* {
+		forward_auth auth-service:3000 {
+			uri /restaurant/validate
+			copy_headers Authorization
+		}
+		reverse_proxy frontend-service:3000
+	}
+
+	handle /api/auth/* {
+		reverse_proxy auth-service:3000
+	}
+
+	handle /api/client-service/* {
+		reverse_proxy client-service:3000
+	}
+
+	handle /api/driver/* {
+		reverse_proxy driver-service:3000
+	}
+
+	handle /api/order/* {
+		reverse_proxy order-service:3000
+	}
+
+	handle /api/payment/* {
+		reverse_proxy paiment-service:3000
+	}
+
+	handle /api/restaurant/* {
+		reverse_proxy restaurant-service:3000
+	}
+
+	handle /api/restaurants/* {
+    		reverse_proxy restaurant-service:3000
+    	}
+
+	handle_path /static/* {
+		reverse_proxy frontend-service:3000
+	}
+
+	# Group all other frontend paths to avoid conflicts
+	handle {
+		reverse_proxy frontend-service:3000
+		}
+	}
