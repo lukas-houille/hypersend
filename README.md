@@ -36,16 +36,29 @@ To get a local copy up and running follow these simple steps.
 -   Docker
 -   Docker Compose
 
-### Installation
+### Quick Start
 
-1.  Run the following command to set up and start the project:
+1.  Run the following command to set up and quick start the project:
     ```sh
     mkdir hypersend && cd hypersend && mkdir conf && \
     curl -o compose.yaml https://raw.githubusercontent.com/lukas-houille/hypersend/main/compose.yaml && \
     curl -o conf/init.sql https://raw.githubusercontent.com/lukas-houille/hypersend/main/conf/init.sql && \
-    docker-compose up -d
+    curl -o conf/Caddyfile https://raw.githubusercontent.com/lukas-houille/hypersend/main/conf/Caddyfile && \
+    docker compose up -d
     ```
 2.  The application will be available at `http://localhost`
+
+### Step-by-Step Setup
+
+1.  Clone the configuration files
+2.  Edit the `compose.yaml` file to configure the services as needed an credentials for the database.
+3   Start the application using Docker Compose:
+    ```sh
+    docker-compose up -d
+    ```
+4.  Access the application at `http://localhost`
+    
+    
 
 ## License
 

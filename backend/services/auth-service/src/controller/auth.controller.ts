@@ -29,6 +29,7 @@ export function signUp() {
             });
             res.status(200).json({role: role, userId: newUser[0].id});
         } catch (e) {
+            console.error("Error creating user:", e);
             res.status(500).json({message: "Error creating user", error: e});
         }
     }
