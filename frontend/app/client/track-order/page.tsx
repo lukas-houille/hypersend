@@ -13,7 +13,7 @@ interface OrderEvent {
 }
 
 export default function SSEPage() {
-    const [orderData, setOrderData] = useState<OrderEvent[]>([]);
+    const [orderData, setOrderData] = useState<OrderEvent | string | null>(null);
 
     useEffect(() => {
         const trackOrder = async () => {
@@ -32,6 +32,8 @@ export default function SSEPage() {
                     onopen: async (res) => {
                         if (res.ok && res.status === 200) {
                             console.log("Connection made ", res);
+                        } else if (res.status === 404) {
+                            setOrderData("No tracking information found order is may be delivered");
                         } else if (
                             res.status >= 400 &&
                             res.status < 500 &&
@@ -50,7 +52,7 @@ export default function SSEPage() {
                                     alert("Your order has been delivered!");
                                     window.location.href = "/client/";
                                 }
-                                setOrderData(prev => [...prev, parsedData]);
+                                setOrderData(parsedData);
                             } catch (e) {
                                 console.error("Failed to parse event data:", event.data, e);
                             }
@@ -74,13 +76,17 @@ export default function SSEPage() {
     return (
         <div className="flex flex-col items-center justify-top h-screen bg-gray-100">
             <Header />
-            <h1 className={"font-black italic"}>SSE Page</h1>
+            <h1 className={"font-black italic"}>Tracking your order</h1>
             <div className="mt-4">
-                {orderData.map((order, index) => (
-                    <div key={index} className="p-4 bg-white shadow rounded mb-2">
-                        <pre>{JSON.stringify(order, null, 2)}</pre>
+                {orderData && typeof orderData === 'object' ? (
+                    <div className="p-4 bg-white shadow rounded mb-2">
+                        <pre>{JSON.stringify(orderData, null, 2)}</pre>
                     </div>
-                ))}
+                ) : (
+                    <div className="p-4 bg-white shadow rounded mb-2">
+                        <p>{orderData}</p>
+                    </div>
+                )}
             </div>
         </div>
     );
