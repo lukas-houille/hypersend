@@ -197,6 +197,11 @@ create table payments
 -- auth-service: Manages user creation and authentication.
 ALTER DEFAULT PRIVILEGES FOR ROLE authservice IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO authservice;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO authservice;
+GRANT INSERT ON TABLE clients TO authservice;
+GRANT USAGE ON SEQUENCE clients_client_id_seq TO authservice;
+GRANT INSERT ON TABLE drivers TO authservice;
+GRANT USAGE ON SEQUENCE drivers_driver_id_seq TO authservice;
+GRANT INSERT ON TABLE restaurants TO authservice;
 
 
 -- client-service: Manages client profiles and interactions.
